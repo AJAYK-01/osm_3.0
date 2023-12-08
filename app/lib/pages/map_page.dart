@@ -1,12 +1,14 @@
+import 'package:app/models/constants.dart';
 import 'package:app/services/location_service.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:syncfusion_flutter_maps/maps.dart';
 
 class MapPage extends StatefulWidget {
-  MapPage({super.key});
-
+  final MapMode mapMode;
   final LocationService _locationService = LocationService();
+
+  MapPage({super.key, required this.mapMode});
 
   @override
   State<MapPage> createState() => _MapPageState();
