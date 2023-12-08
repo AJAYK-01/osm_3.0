@@ -19,6 +19,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   syncfusion_flutter_maps: ^23.2.6
   geolocator: ^10.1.0
+  image_picker: ^1.0.4
 
 dev_dependencies:
   flutter_test:

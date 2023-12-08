@@ -1,8 +1,14 @@
 import 'package:app/models/constants.dart';
-import 'package:app/services/location_service.dart';
+import 'package:app/models/models.dart';
+import 'package:app/services/places_service.dart';
+import 'package:app/widgets/add_place.dart';
+import 'package:app/widgets/markers.dart';
+import 'package:app/widgets/view_place.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:syncfusion_flutter_maps/maps.dart';
+
+import '../services/location_service.dart';
 
 class MapPage extends StatefulWidget {
   final MapMode mapMode;
@@ -19,15 +25,19 @@ class _MapPageState extends State<MapPage> {
   late MapTileLayerController _mapController;
   late MapZoomPanBehavior _mapZoomPanController;
 
+  // Add a list of MapMarker objects for Custom Places
+  late List<Place> places;
+
   @override
   void initState() {
+    loadPlaceMarkers();
+
     _mapController = MapTileLayerController();
     _mapZoomPanController = MapZoomPanBehavior(
       maxZoomLevel: 20,
       enableDoubleTapZooming: true,
       showToolbar: false,
     );
-
     // just keep track of the location always when available
     var currLocationStream = LocationService();
     currLocationStream.livePosition().listen((Position newPosition) {
@@ -40,6 +50,23 @@ class _MapPageState extends State<MapPage> {
     });
 
     super.initState();
+  }
+
+  void loadPlaceMarkers() async {
+    PlacesService placesController = PlacesService();
+    // Add a list of Place objects
+    places = await placesController.loadPlaces();
+
+    // Add the markers to the map
+    for (int i = 0; i < places.length; i++) {
+      _mapController.insertMarker(i + 1);
+    }
+  }
+
+  void movePoint(point) {
+    setState(() {
+      _mapZoomPanController.focalLatLng = point;
+    });
   }
 
   @override
@@ -70,14 +97,18 @@ class _MapPageState extends State<MapPage> {
                   final MapLatLng currlatLng =
                       _mapController.pixelToLatLng(localPosition);
 
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Text(
-                        'latitude: ${currlatLng.latitude} longitude: ${currlatLng.longitude}',
-                      );
-                    },
-                  );
+                  if (widget.mapMode == MapMode.contribute) {
+                    // movePoint(currlatLng);
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AddPlace(
+                          latitude: currlatLng.latitude,
+                          longitude: currlatLng.longitude,
+                        );
+                      },
+                    );
+                  }
                 },
                 child: SfMaps(
                   layers: [
@@ -92,9 +123,28 @@ class _MapPageState extends State<MapPage> {
                           initLocationSnapshot.data!.longitude),
                       controller: _mapController,
                       markerBuilder: (BuildContext context, int index) {
-                        return MapMarker(
-                            latitude: initLocationSnapshot.data!.latitude,
-                            longitude: initLocationSnapshot.data!.longitude);
+                        if (index == 0) {
+                          // The first marker is the current location marker
+                          return CurrentLocationMarker(
+                            latitude: currLocation.latitude,
+                            longitude: currLocation.longitude,
+                          );
+                        } else if (places.length > index - 1) {
+                          // The other markers are the custom places markers
+                          return PlacesMarker(
+                            place: places[index - 1],
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return ViewPlace(place: places[index - 1]);
+                                },
+                              );
+                            },
+                          );
+                        } else {
+                          return const EmptyMarker();
+                        }
                       },
                     ),
                   ],
