@@ -33,7 +33,62 @@ class _AddPlaceState extends State<AddPlace> {
     }
   }
 
-  Future<void> _submitPlace() async {}
+  Future<void> _submitPlace() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 10),
+              Text('Submitting place...'),
+            ],
+          ),
+        );
+      },
+    );
+
+    final List<String> cids = [];
+    for (final image in _images) {
+      final bytes = await image.file.readAsBytes();
+      final result = await IpfsService.uploadBytesToIPFS(bytes);
+      cids.add(result.$2);
+    }
+
+    final Place place = Place(
+        latitude: widget.latitude,
+        longitude: widget.longitude,
+        name: _nameController.text,
+        description: _descriptionController.text,
+        images: cids);
+
+    final bool success = await PlacesService.uploadPlaceToIPFS(place);
+
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context); // Close the loading dialog
+
+    // ignore: use_build_context_synchronously
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(success ? 'Upload Successful' : 'Upload Failed'),
+          actions: [
+            TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.pop(context); // close the success popup
+                  if (success) {
+                    Navigator.pop(context); // close the bottom sheet as well
+                  }
+                }),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

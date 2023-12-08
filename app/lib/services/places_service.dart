@@ -61,4 +61,31 @@ class PlacesService {
   loadPlaces() {
     return places;
   }
+
+  static Future<bool> uploadPlaceToIPFS(Place place) async {
+    // Create a map from the Place object
+    final Map<String, dynamic> placeMap = {
+      'latitude': place.latitude,
+      'longitude': place.longitude,
+      'name': place.name,
+      'description': place.description,
+      'images': place.images,
+    };
+
+    // Convert the map to a JSON string
+    final String placeJson = jsonEncode(placeMap);
+
+    // Convert the JSON string to bytes
+    final List<int> placeBytes = utf8.encode(placeJson);
+
+    // Upload the JSON bytes to IPFS
+    final result = await IpfsService.uploadBytesToIPFS(placeBytes);
+    log("Status Code: ${result.$1}");
+    log("CID: ${result.$2}");
+
+    if (result.$1 == 200) {
+      return true;
+    }
+    return false;
+  }
 }
