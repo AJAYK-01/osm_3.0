@@ -26,12 +26,10 @@ class _MapPageState extends State<MapPage> {
   late MapZoomPanBehavior _mapZoomPanController;
 
   // Add a list of MapMarker objects for Custom Places
-  late List<Place> places;
+  List<Place> places = [];
 
   @override
   void initState() {
-    loadPlaceMarkers();
-
     _mapController = MapTileLayerController();
     _mapZoomPanController = MapZoomPanBehavior(
       maxZoomLevel: 20,
@@ -43,6 +41,7 @@ class _MapPageState extends State<MapPage> {
     currLocationStream.livePosition().listen((Position newPosition) {
       if (currLocation != newPosition) {
         currLocation = newPosition;
+        loadPlaceMarkers();
         _mapController.updateMarkers([0]);
         // widget._mapZoomPanController.focalLatLng =
         //     MapLatLng(currLocation.latitude, currLocation.longitude);
@@ -55,7 +54,10 @@ class _MapPageState extends State<MapPage> {
   void loadPlaceMarkers() async {
     PlacesService placesController = PlacesService();
     // Add a list of Place objects
-    places = await placesController.loadPlaces();
+    // places = await placesController.loadPlaces(
+    //     currLocation.latitude, currLocation.longitude);
+
+    places = await placesController.loadPlaces(12.202001, 12.220080);
 
     // Add the markers to the map
     for (int i = 0; i < places.length; i++) {

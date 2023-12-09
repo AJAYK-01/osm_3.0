@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:app/models/models.dart';
+import 'package:app/services/graphql_service.dart';
 import 'package:app/services/ipfs_service.dart';
 
 class PlacesService {
@@ -58,7 +59,10 @@ class PlacesService {
     ),
   ];
 
-  loadPlaces() {
+  loadPlaces(double latitude, double longitude) async {
+    final gql = GraphqlService();
+    final placs = await gql.getPlacesNear(latitude, longitude);
+    log("Placss: ${placs.toString()} ");
     return places;
   }
 
