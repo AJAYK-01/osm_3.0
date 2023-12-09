@@ -63,12 +63,12 @@ class GraphqlService {
   Future<QueryResult> getPlaceSearch(String name) {
     String getPlaceSearchQuery = '''
       query {
-        placeApproveds(where: {name: "$name"}) {
-          id
-          place_name
-          latitude
-          longitude
-          placeCid
+          placeApproveds(where: {place_name_contains_nocase: "$name"}) {
+            id
+            place_name
+            latitude
+            longitude
+            placeCid
         }
       }
     ''';

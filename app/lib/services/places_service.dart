@@ -60,9 +60,35 @@ class PlacesService {
     ),
   ];
 
-  static loadPlaces(double latitude, double longitude) async {
+  static Future<List<Place>> loadPlaces(
+      double latitude, double longitude) async {
     final gql = GraphqlService();
     final QueryResult placs = await gql.getPlacesNear(latitude, longitude);
+    log("Placss: ${placs.toString()} ");
+
+    if (placs.hasException) {
+      log("Error: ${placs.exception.toString()}");
+      return [];
+    }
+
+    final List<Place> places = (placs.data!['placeApproveds'] as List)
+        .map(
+          (place) => Place(
+            id: place['id'],
+            latitude: double.parse(place['latitude']) / 1e6,
+            longitude: double.parse(place['longitude']) / 1e6,
+            placeName: place['place_name'],
+            placeCid: place['placeCid'],
+          ),
+        )
+        .toList();
+
+    return places;
+  }
+
+  static Future<List<Place>> searchPlace(String query) async {
+    final gql = GraphqlService();
+    final QueryResult placs = await gql.getPlaceSearch(query);
     log("Placss: ${placs.toString()} ");
 
     if (placs.hasException) {

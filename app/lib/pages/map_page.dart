@@ -3,6 +3,7 @@ import 'package:app/models/models.dart';
 import 'package:app/services/places_service.dart';
 import 'package:app/widgets/add_place.dart';
 import 'package:app/widgets/markers.dart';
+import 'package:app/widgets/search_places.dart';
 import 'package:app/widgets/view_place.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -41,7 +42,7 @@ class _MapPageState extends State<MapPage> {
     currLocationStream.livePosition().listen((Position newPosition) {
       if (currLocation != newPosition) {
         currLocation = newPosition;
-        loadPlaceMarkers();
+        loadPlaceMarkers(currLocation.latitude, currLocation.longitude);
         _mapController.updateMarkers([0]);
         // widget._mapZoomPanController.focalLatLng =
         //     MapLatLng(currLocation.latitude, currLocation.longitude);
@@ -51,10 +52,9 @@ class _MapPageState extends State<MapPage> {
     super.initState();
   }
 
-  void loadPlaceMarkers() async {
+  void loadPlaceMarkers(double latitude, double longitude) async {
     // Add a list of Place objects
-    places = await PlacesService.loadPlaces(
-        currLocation.latitude, currLocation.longitude);
+    places = await PlacesService.loadPlaces(latitude, longitude);
 
     // places = await PlacesService.loadPlaces(12.202001, 12.220080);
 
@@ -64,10 +64,12 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  void movePoint(point) {
+  void movePoint(Place point) {
     setState(() {
-      _mapZoomPanController.focalLatLng = point;
+      _mapZoomPanController.focalLatLng =
+          MapLatLng(point.latitude, point.longitude);
     });
+    loadPlaceMarkers(point.latitude, point.longitude);
   }
 
   @override
@@ -179,7 +181,14 @@ class _MapPageState extends State<MapPage> {
                     ),
                   ],
                 ),
-              )
+              ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SearchPlaces(onItemSelected: movePoint),
+                ),
+              ),
             ],
           );
         } else {
