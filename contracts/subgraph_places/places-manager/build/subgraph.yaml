@@ -1,0 +1,27 @@
+specVersion: 0.0.5
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum
+    name: PlacesManager
+    network: mumbai
+    source:
+      address: "0xf2A71b717Da27351Be579fF24D601e4b6d3d01CE"
+      abi: PlacesManager
+      startBlock: 43343578
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - placeAdded
+        - placeApproved
+      abis:
+        - name: PlacesManager
+          file: PlacesManager/abis/PlacesManager.json
+      eventHandlers:
+        - event: placeAdded(address,string,uint256,uint256)
+          handler: handleplaceAdded
+        - event: placeApproved(string,string,uint256,uint256)
+          handler: handleplaceApproved
+      file: PlacesManager/PlacesManager.wasm

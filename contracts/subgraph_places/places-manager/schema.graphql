@@ -1,0 +1,21 @@
+type placeAdded @entity(immutable: true) {
+  id: Bytes!
+  contributor: Bytes! # address
+  place_name: String! # string
+  latitude: BigInt! # uint256
+  longitude: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type placeApproved @entity(immutable: true) {
+  id: Bytes!
+  placeCid: String! # string
+  place_name: String! # string
+  latitude: BigInt! # uint256
+  longitude: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
