@@ -4,10 +4,11 @@ import 'dart:developer';
 import 'package:app/models/models.dart';
 import 'package:app/services/graphql_service.dart';
 import 'package:app/services/ipfs_service.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 class PlacesService {
-  List<Place> places = [
-    Place(
+  List<PlaceMetadata> places = [
+    PlaceMetadata(
       latitude: 545217357767546,
       longitude: 76.20325944032045,
       name: 'Place 1',
@@ -17,7 +18,7 @@ class PlacesService {
             'https://imageio.forbes.com/specials-images/dam/imageserve/1171238184/960x0.jpg?height=473&width=711&fit=bounds',
       ],
     ),
-    Place(
+    PlaceMetadata(
       latitude: 10.535217357767546,
       longitude: 76.20825944032045,
       name: 'Place 2',
@@ -27,7 +28,7 @@ class PlacesService {
         'https://i.dawn.com/primary/2019/06/5d02a993e2dfa.png'
       ],
     ),
-    Place(
+    PlaceMetadata(
       latitude: 10.540217357767546,
       longitude: 76.19825944032045,
       name: 'Place 3',
@@ -38,7 +39,7 @@ class PlacesService {
         'https://hippie-inheels.com/wp-content/uploads/2018/03/taj-mahal-places-to-visit-in-india-1024x678.jpg'
       ],
     ),
-    Place(
+    PlaceMetadata(
       latitude: 10.535217357767546,
       longitude: 76.20325944032045,
       name: 'Place 4',
@@ -48,7 +49,7 @@ class PlacesService {
         'https://www.kapilindiatours.com/Citytour/delhi.jpg',
       ],
     ),
-    Place(
+    PlaceMetadata(
       latitude: 10.545217357767546,
       longitude: 76.19825944032045,
       name: 'Place 5',
@@ -59,14 +60,32 @@ class PlacesService {
     ),
   ];
 
-  loadPlaces(double latitude, double longitude) async {
+  static loadPlaces(double latitude, double longitude) async {
     final gql = GraphqlService();
-    final placs = await gql.getPlacesNear(latitude, longitude);
+    final QueryResult placs = await gql.getPlacesNear(latitude, longitude);
     log("Placss: ${placs.toString()} ");
+
+    if (placs.hasException) {
+      log("Error: ${placs.exception.toString()}");
+      return [];
+    }
+
+    final List<Place> places = (placs.data!['placeApproveds'] as List)
+        .map(
+          (place) => Place(
+            id: place['id'],
+            latitude: double.parse(place['latitude']) / 1e6,
+            longitude: double.parse(place['longitude']) / 1e6,
+            placeName: place['place_name'],
+            placeCid: place['placeCid'],
+          ),
+        )
+        .toList();
+
     return places;
   }
 
-  static Future<bool> uploadPlaceToIPFS(Place place) async {
+  static Future<bool> uploadPlaceToIPFS(PlaceMetadata place) async {
     // Create a map from the Place object
     final Map<String, dynamic> placeMap = {
       'latitude': place.latitude,

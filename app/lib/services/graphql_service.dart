@@ -18,6 +18,7 @@ class GraphqlService {
           place_name
           latitude
           longitude
+          placeCid
         }
       }
     ''';
@@ -47,6 +48,7 @@ class GraphqlService {
           place_name
           latitude
           longitude
+          placeCid
         }
       }
     ''';
@@ -66,6 +68,7 @@ class GraphqlService {
           place_name
           latitude
           longitude
+          placeCid
         }
       }
     ''';

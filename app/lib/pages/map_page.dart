@@ -52,12 +52,11 @@ class _MapPageState extends State<MapPage> {
   }
 
   void loadPlaceMarkers() async {
-    PlacesService placesController = PlacesService();
     // Add a list of Place objects
-    // places = await placesController.loadPlaces(
-    //     currLocation.latitude, currLocation.longitude);
+    places = await PlacesService.loadPlaces(
+        currLocation.latitude, currLocation.longitude);
 
-    places = await placesController.loadPlaces(12.202001, 12.220080);
+    // places = await PlacesService.loadPlaces(12.202001, 12.220080);
 
     // Add the markers to the map
     for (int i = 0; i < places.length; i++) {

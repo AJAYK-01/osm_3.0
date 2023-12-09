@@ -57,7 +57,7 @@ class _AddPlaceState extends State<AddPlace> {
       cids.add(result.$2);
     }
 
-    final Place place = Place(
+    final PlaceMetadata place = PlaceMetadata(
         latitude: widget.latitude,
         longitude: widget.longitude,
         name: _nameController.text,

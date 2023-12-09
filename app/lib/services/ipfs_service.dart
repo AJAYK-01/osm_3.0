@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:app/models/models.dart';
 import 'package:http/http.dart' as http;
 
 class IpfsService {
@@ -19,6 +20,24 @@ class IpfsService {
       return (response.statusCode, cid);
     } else {
       return (response.statusCode, respStr);
+    }
+  }
+
+  static Future<PlaceMetadata> fetchPlaceMetadata(String cid) async {
+    final response = await http
+        .get(Uri.parse('https://gateway.lighthouse.storage/ipfs/$cid'));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return PlaceMetadata(
+        latitude: data['latitude'],
+        longitude: data['longitude'],
+        name: data['name'],
+        description: data['description'],
+        images: List<String>.from(data['images']),
+      );
+    } else {
+      throw Exception('Failed to load place metadata');
     }
   }
 }
