@@ -5,6 +5,8 @@ GMaps reward program only rewrds user with stars with no real value.<br/>
 Here, contributors get rewards for their contributions.<br/>
 Advertisement Business can buy our tokens to place location ads.<br/>
 
+Ethindia submission: https://devfolio.co/projects/osm-47eb
+
 ## Tech Stacks
 
 - Flutter - mobile app.
